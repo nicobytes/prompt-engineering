@@ -1,0 +1,40 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+description: 'Temperature'
+
+prompts:
+  - ./prompt.json
+
+providers:
+  - id: openai:gpt-4.1
+    label: GPT-4.1 (temp=0) deterministic
+    config:
+      temperature: 0
+  - id: openai:gpt-4.1
+    label: GPT-4.1 (temp=1.8) creative
+    config:
+      temperature: 1.8
+  # - id: google:gemini-2.5-pro-preview-06-05
+  #   label: Gemini 2.5 Pro (temp=0) deterministic
+  #   config:
+  #     temperature: 0
+  # - id: google:gemini-2.5-pro-preview-06-05
+  #   label: Gemini 2.5 Pro (temp=2) creative
+  #   config:
+  #     temperature: 2
+
+tests:
+  - vars:
+      system_prompt: file://./system_prompt.txt
+      question: 'Imagina que los animales pudieran hablar. ¿Qué tipo de conversaciones tendrían los perros con los gatos sobre sus dueños?'
+  - vars:
+      system_prompt: file://./system_prompt.txt
+      question: 'Describe un nuevo color que nadie haya visto antes. ¿Cómo se vería y qué emociones evocaría?'
+  - vars:
+      system_prompt: file://./system_prompt.txt
+      question: 'Si pudieras viajar en el tiempo, ¿a qué época irías y qué harías para cambiar la historia (sin causar paradojas importantes)?'
+  - vars:
+      system_prompt: file://./system_prompt.txt
+      question: 'Escribe un corto poema de cuatro versos sobre la lluvia, pero desde la perspectiva de una flor que nunca la ha sentido.'
+  - vars:
+      system_prompt: file://./system_prompt.txt
+      question: 'Inventa un nuevo deporte. Describe sus reglas básicas, el objetivo y cómo se ganaría.'

@@ -1,0 +1,10 @@
+[
+    {
+      "role": "system",
+      "content": "{{system_prompt}}"
+    },
+    {
+      "role": "user",
+      "content": "Provide a summary of the following transcript: {{transcript}}"
+    }
+  ]

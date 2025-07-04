@@ -1,0 +1,19 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+description: 'Temperature'
+
+prompts:
+  - 'You are a helpful assistant and your responses are concise and to the point, solve the following user request: {{prompt}}'
+
+providers:
+  - id: openai:gpt-4.1
+    label: GPT-4.1 (temp=0)
+    config:
+      temperature: 0
+  - id: openai:gpt-4.1
+    label: GPT-4.1 (temp=1)
+    config:
+      temperature: 1
+
+tests:
+  - vars:
+      prompt: 'Cuando dejo un hielo en el sol...'

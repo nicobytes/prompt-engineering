@@ -1,0 +1,51 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+description: 'Creative'
+
+prompts:
+  - ./prompt.json
+
+providers:
+  - id: openai:gpt-4.1
+    label: GPT-4.1
+    config:
+      temperature: 0.2
+      top_p: 0.9
+
+tests:
+  - name: Neutral
+    vars:
+      system_prompt: file://./system_prompt.v1.md
+      question: >-
+        Estuve vistando el restaurante el sabado pasado y la comida fue muy rica.
+        Las bebidas llegaron tarde y la entrada duro mucho tiempo en llegar a la mesa, pero cuando la comida llegó fue muy rica.
+        El servicio fue muy bueno, pero el restaurante está un poco lejos de la ciudad.
+    assert:
+    - type: equals
+      value: 'Neutral'
+
+  - name: Positivo
+    vars:
+      system_prompt: file://./system_prompt.v1.md
+      question: >-
+        La comida fue muy rica y el servicio fue muy bueno.
+    assert:
+    - type: equals
+      value: 'Positivo'
+
+  - name: Negativo
+    vars:
+      system_prompt: file://./system_prompt.v1.md
+      question: >-
+        Todo fue un desastre, la comida fue horrible y el servicio fue peor.
+    assert:
+    - type: equals
+      value: 'Negativo'
+
+  - name: Negativo
+    vars:
+      system_prompt: file://./system_prompt.v1.md
+      question: >-
+        No me gustó nada, la comida fue horrible y el servicio fue peor. Pero la mesera fue muy amable con nosotros.
+    assert:
+    - type: equals
+      value: 'Negativo'

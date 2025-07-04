@@ -1,0 +1,34 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+description: 'Creative'
+
+prompts:
+  - ./prompt.json
+
+providers:
+  - id: openai:gpt-4.1
+    label: GPT-4.1 (base)
+    config:
+      temperature: 0.2
+      top_p: 0.9
+  - id: openai:gpt-4.1
+    label: GPT-4.1 (creative)
+    config:
+      temperature: 0.9
+      top_p: 0.99
+  - id: openai:gpt-4.1
+    label: GPT-4.1 (deterministic)
+    config:
+      temperature: 0.1
+      top_p: 0.9
+
+tests:
+  - vars:
+      prompt: 'Imagina que los animales pudieran hablar. ¿Qué tipo de conversaciones tendrían los perros con los gatos sobre sus dueños?'
+  - vars:
+      prompt: 'Describe un nuevo color que nadie haya visto antes. ¿Cómo se vería y qué emociones evocaría?'
+  - vars:
+      prompt: 'Si pudieras viajar en el tiempo, ¿a qué época irías y qué harías para cambiar la historia (sin causar paradojas importantes)?'
+  - vars:
+      prompt: 'Escribe un corto poema de cuatro versos sobre la lluvia, pero desde la perspectiva de una flor que nunca la ha sentido.'
+  - vars:
+      prompt: 'Inventa un nuevo deporte. Describe sus reglas básicas, el objetivo y cómo se ganaría.'

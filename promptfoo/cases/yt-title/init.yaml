@@ -1,0 +1,22 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+description: 'Temperature'
+
+prompts:
+  - ./prompt.json
+
+providers:
+  - id: openai:o4-mini
+    label: GPT-4o-mini
+    config:
+      temperature: 1.5
+
+tests:
+  - vars:
+      system_prompt: file://./system_prompt.v1.md
+      content: file://./summary.txt
+      language: Spanish Latin America
+
+  - vars:
+      system_prompt: file://./system_prompt.v2.md
+      content: file://./summary.txt
+      language: Spanish Latin America
