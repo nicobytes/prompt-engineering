@@ -1,3 +1,5 @@
+set dotenv-load
+
 just:
 	@just --list
 
@@ -9,5 +11,11 @@ promptfoo path:
 title:
 	just promptfoo yt-title
 
-promptfoo-view:
+chapters:
+	just promptfoo yt-chapters
+
+summary:
+	just promptfoo summarize
+
+view:
 	npx promptfoo@latest view

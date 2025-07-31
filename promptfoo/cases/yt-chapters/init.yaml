@@ -1,5 +1,5 @@
 # yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
-description: 'YouTube Description'
+description: 'YouTube Chapters'
 
 prompts:
   - ./prompt.json
@@ -12,6 +12,5 @@ providers:
 
 tests:
   - vars:
-      system_prompt: file://./system_prompt.v1.md
-      content: file://./summary.txt
-      language: Spanish Latin America
+      system_prompt: file://./system_prompt.md
+      transcript: file://./transcript.srt
