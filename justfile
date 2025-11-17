@@ -11,6 +11,9 @@ promptfoo path:
 title:
 	just promptfoo yt-title
 
+content:
+	just promptfoo yt-content
+
 chapters:
 	just promptfoo yt-chapters
 
