@@ -5,6 +5,6 @@
     },
     {
       "role": "user",
-      "content": "Create the chapters in Spanish based on this transcript: {{transcript}}"
+      "content": "Create the chapters in Spanish based on this transcript: {{transcript}} with this summary: {{content}}"
     }
   ]

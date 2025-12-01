@@ -5,8 +5,8 @@ prompts:
   - ./prompt.json
 
 providers:
-  - id: openai:o4-mini
-    label: GPT-4o-mini
+  - id: openai:gpt-5.1
+    label: GPT-5.1
     config:
       temperature: 1.5
 
@@ -14,3 +14,4 @@ tests:
   - vars:
       system_prompt: file://./system_prompt.md
       transcript: file://./transcript.srt
+      content: file://./summary.txt
