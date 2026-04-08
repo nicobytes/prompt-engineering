@@ -5,7 +5,7 @@ just:
 
 promptfoo path:
 	@echo {{path}}
-	npx promptfoo@latest eval --config ./promptfoo/cases/{{path}}/init.yaml
+	npx promptfoo eval --config ./promptfoo/cases/{{path}}/init.yaml
 
 
 title:
@@ -21,4 +21,4 @@ summary:
 	just promptfoo summarize
 
 view:
-	npx promptfoo@latest view
+	npx promptfoo view

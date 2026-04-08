@@ -2,7 +2,9 @@
 
 - Generate YouTube chapter timestamps for the video, formatted as 'MM:SS - Chapter Title'.
 - Ensure all major topics and transitions are included in the chapter summaries, starting with '00:00'.
-- Generate maximum 15 chapters.
+- Generate maximum 10 chapters.
+- The chapters should be in Spanish.
+- The chapters should be concise and to the point.
 
 # Steps:
 

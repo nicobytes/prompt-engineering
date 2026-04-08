@@ -1,832 +1,948 @@
 1
-00:00:00,000 --> 00:00:06,300
-En Frontend tenemos tres técnicas básicas para como renderiar o entregar nuestra aplicación
+00:00:00,000 --> 00:00:03,740
+Hoy vas a aprender cómo desplegar una aplicación de Angular en la nube de Cloudflare.
 
 2
-00:00:06,300 --> 00:00:09,580
-y eso normalmente es server-side rendering, client-side rendering,
+00:00:04,000 --> 00:00:06,820
+Y sí, ya sé, yo ya había grabado este video un poquito atrás,
 
 3
-00:00:09,760 --> 00:00:12,880
-que es cuando literalmente todo se renderiza desde el lado del cliente,
+00:00:06,940 --> 00:00:11,120
+pero las cosas en Angular han cambiado, han cambiado la API para hacer realmente
 
 4
-00:00:13,260 --> 00:00:15,800
-y en el medio que se llama el static, ¿bien?
+00:00:11,120 --> 00:00:15,240
+mucho más fácil este despliegue y también Cloudflare ha cambiado un poco sus servicios,
 
 5
-00:00:16,380 --> 00:00:21,580
-Si bien nosotros normalmente tenemos que escoger cuál es la mejor técnica de arquitectura
+00:00:15,380 --> 00:00:17,900
+así que vamos a ver cómo se hace hoy en el 2026,
 
 6
-00:00:21,580 --> 00:00:25,620
-o de entrega de contenido, depende pues a nuestras aplicaciones, a nuestro contexto,
+00:00:18,320 --> 00:00:21,300
+cómo podríamos desplegar esta aplicación en esta nube tan potente
 
 7
-00:00:25,620 --> 00:00:30,240
-Angular nos regala algo muy interesante y es que lo podemos hacer a nivel de ruta.
+00:00:21,300 --> 00:00:25,300
+que a mí personalmente me gusta mucho y que además de eso es súper económica y barata.
 
 8
-00:00:30,400 --> 00:00:30,900
-¿Qué quiere decir?
+00:00:25,440 --> 00:00:29,460
+Y podemos tener un server-side rendering de mucha calidad y mucha performance,
 
 9
-00:00:31,320 --> 00:00:36,120
-Que si bien yo quiero hacer server-side rendering, puedo hacerlo a nivel de ruta.
+00:00:29,460 --> 00:00:35,000
+es decir, el rendering es muy, muy rápido y además soportar todos los features de Angular.
 
 10
-00:00:36,320 --> 00:00:39,180
-La ruta de index quiero que sea server-side rendering,
+00:00:35,140 --> 00:00:36,100
+Así que empecemos.
 
 11
-00:00:39,560 --> 00:00:43,620
-pero de pronto la ruta de login no tiene necesidad de ser server-side rendering,
+00:00:43,000 --> 00:00:46,920
+Desde el lado de Cloudflare lo que ha cambiado es que ellos han migrado su servicio
 
 12
-00:00:43,880 --> 00:00:46,000
-entonces podríamos decirle que sea client.
+00:00:46,920 --> 00:00:51,220
+que antes llamaban Pages hacia Workers, que va a ser el servicio primordial
 
 13
-00:00:46,360 --> 00:00:48,620
-O por ejemplo, todo lo que sea block sea static.
+00:00:51,220 --> 00:00:55,140
+para correr cualquier cosa que tenga que ver con Edge Computer en la nube de Cloudflare.
 
 14
-00:00:49,640 --> 00:00:53,360
-Quiere decir que no nos casamos con una técnica para todo el proyecto,
+00:00:55,460 --> 00:00:57,160
+Entonces hay un cambio de servicios.
 
 15
-00:00:53,360 --> 00:00:55,380
-sino que realmente podemos elegir,
+00:00:57,160 --> 00:01:02,060
+Sobre todo nosotros utilizando los Edge o el Computing Edge de Cloudflare
 
 16
-00:00:55,620 --> 00:00:57,700
-la estrategia más adecuada por ruta.
+00:01:02,060 --> 00:01:08,160
+vamos a ganar muchísimo rendimiento haciendo server-side rendering en una nube que es muy, muy económica.
 
 17
-00:00:57,860 --> 00:00:59,760
-A eso se le conoce como server-roaring.
+00:01:08,680 --> 00:01:13,900
+Y por el otro lado tenemos a Angular en el cual nos dice que ahora es mucho más abierto
 
 18
-00:00:59,980 --> 00:01:01,920
-Así que vamos a ver cómo se implementa en Angular.
+00:01:13,900 --> 00:01:18,340
+y más fácil correr Angular desde servidores que no dependan de Node.js.
 
 19
-00:01:02,240 --> 00:01:03,540
-Esta es la aplicación que tengo de ejemplo,
+00:01:18,660 --> 00:01:23,400
+Esto quiere decir que tenemos nuevos Runtimes, es decir, tenemos cosas como Dino, Boom,
 
 20
-00:01:03,720 --> 00:01:06,860
-y como ves es un e-commerce, un e-commerce tradicional, ¿bien?
+00:01:23,400 --> 00:01:26,400
+los Cloudflare Workers, E.Javascript.
 
 21
-00:01:07,040 --> 00:01:10,460
-Pero aquí es donde podemos tener estrategias de renderizado diferentes
+00:01:27,160 --> 00:01:28,160
+etcétera.
 
 22
-00:01:10,460 --> 00:01:12,640
-de acuerdo pues a cada una de las rutas.
+00:01:28,160 --> 00:01:33,660
+Diferentes Runtimes que hacen que sea JavaScript mucho más ligero y que corra mucho más rápido.
 
 23
-00:01:13,080 --> 00:01:15,900
-Por ejemplo, el home yo sí quiero que sea server-side,
+00:01:33,660 --> 00:01:35,160
+Sobre todo en el Edge Computing.
 
 24
-00:01:16,160 --> 00:01:19,420
-por optimización, por cargar el contenido, etc.
+00:01:35,160 --> 00:01:39,160
+Y para eso tenemos esta nueva API llamada Angular App Engine
 
 25
-00:01:20,020 --> 00:01:22,180
-Pero por ejemplo, la página de locations,
+00:01:39,160 --> 00:01:42,160
+que haciendo un par de configuraciones podríamos dedicar,
 
 26
-00:01:22,740 --> 00:01:25,180
-que literalmente por si pide una geolocalización,
+00:01:42,160 --> 00:01:45,660
+porque normalmente cuando nosotros creamos una aplicación en Angular
 
 27
-00:01:25,620 --> 00:01:28,080
-quiere decir que tengo que correr un feature
+00:01:45,660 --> 00:01:47,660
+viene, sobre todo con server-side rendering,
 
 28
-00:01:28,080 --> 00:01:29,500
-que va desde el lado del cliente,
+00:01:47,660 --> 00:01:50,160
+viene con Express por defecto.
 
 29
-00:01:29,500 --> 00:01:34,000
-quiero que esta parte, si por ejemplo, sea client-side.
+00:01:50,160 --> 00:01:52,160
+Y Express depende de Node.
 
 30
-00:01:34,000 --> 00:01:35,620
-O por ejemplo, la página de about,
+00:01:52,160 --> 00:01:56,160
+Sin embargo, haciendo este par de configuraciones vamos a lograr que corra
 
 31
-00:01:35,620 --> 00:01:39,060
-también podríamos decir que el about no cambia mucho,
+00:01:56,160 --> 00:01:56,660
+en la nube.
 
 32
-00:01:39,060 --> 00:01:43,060
-entonces podríamos elegir que about sea static, generate.
+00:01:56,660 --> 00:01:59,660
+En estos nuevos Runtimes modernos, ligeros y rápidos.
 
 33
-00:01:43,060 --> 00:01:46,860
-Es decir, que se va generando cada vez que generemos un build
+00:01:59,660 --> 00:02:00,660
+Así que vamos a empezar.
 
 34
-00:01:46,860 --> 00:01:48,860
-y lancemos eso a producción.
+00:02:00,660 --> 00:02:06,660
+Voy a iniciar un proyecto desde cero para correr una aplicación de server-side rendering
 
 35
-00:01:48,860 --> 00:01:52,360
-Entonces, realmente podríamos elegir diferentes técnicas
+00:02:06,660 --> 00:02:09,660
+y empezar a hacer las configuraciones apropiadas.
 
 36
-00:01:52,360 --> 00:01:55,120
-de acuerdo a nuestras necesidades en un mismo proyecto.
+00:02:09,660 --> 00:02:17,660
+Entonces empezamos con nuestro comando nginio y vamos a hacer ng-edge-example.
 
 37
-00:01:55,120 --> 00:01:55,620
-Vamos a ver.
+00:02:17,660 --> 00:02:19,660
+Esa va a ser nuestra aplicación.
 
 38
-00:01:55,620 --> 00:01:57,000
-Vamos a ver cómo se implementa.
+00:02:19,660 --> 00:02:21,660
+Le voy a decir que todo bien, que sí.
 
 39
-00:01:57,000 --> 00:01:59,300
-Si tú vas a tu aplicación, normalmente,
+00:02:21,660 --> 00:02:22,660
+Vamos a meterle Tailwind.
 
 40
-00:01:59,300 --> 00:02:01,620
-y ya le habilitaste server-side rendering,
+00:02:22,660 --> 00:02:25,660
+Aquí es donde le decimos si necesitamos server-side rendering.
 
 41
-00:02:01,620 --> 00:02:04,420
-lo más normal es que te encuentres con un archivo de configuración
+00:02:25,660 --> 00:02:27,660
+Le digo que sí.
 
 42
-00:02:04,420 --> 00:02:08,000
-llamado app-routes-server.
+00:02:27,660 --> 00:02:30,660
+Vamos a decirle que nuestro IDE va a ser Cursor
 
 43
-00:02:08,680 --> 00:02:09,180
-Bien.
+00:02:30,660 --> 00:02:33,660
+y que obviamente necesitamos Agents.md.
 
 44
-00:02:09,640 --> 00:02:13,520
-Ese es el que define precisamente cuál estrategia de rendering
+00:02:33,660 --> 00:02:35,660
+Yo creo que con esto basta.
 
 45
-00:02:13,520 --> 00:02:16,480
-utilizar mejor y sobre todo en qué casos.
+00:02:35,660 --> 00:02:38,660
+Y vamos a crear este primer proyecto que tiene server-side rendering.
 
 46
-00:02:16,940 --> 00:02:18,720
-Entonces, por ejemplo, por defecto,
+00:02:38,660 --> 00:02:40,660
+Aquí ya ha terminado de crear el proyecto,
 
 47
-00:02:18,720 --> 00:02:21,180
-él va a renderear todo con server-side.
+00:02:40,660 --> 00:02:43,660
+así que entra a la carpeta, vamos a abrir nuestro IDE Cursor
 
 48
-00:02:21,180 --> 00:02:21,560
-Todo.
+00:02:43,660 --> 00:02:45,660
+para empezar a hacer ciertos detalles.
 
 49
-00:02:21,560 --> 00:02:24,020
-Todo lo va a hacer desde el lado del servidor.
+00:02:45,660 --> 00:02:47,660
+Listo, aquí tenemos la configuración.
 
 50
-00:02:24,280 --> 00:02:25,560
-Pero aquí es donde podemos hacer
+00:02:47,660 --> 00:02:49,660
+Nada del otro mundo.
 
 51
-00:02:25,620 --> 00:02:28,380
-mucho más estratégicos y dependiendo realmente
+00:02:49,660 --> 00:02:53,660
+Sin embargo, lo primero que vamos a hacer es agregar una dependencia
 
 52
-00:02:28,380 --> 00:02:30,740
-de lo que queramos, podríamos entonces habilitar
+00:02:53,660 --> 00:02:54,660
+que nos pide Cloudflare
 
 53
-00:02:30,740 --> 00:02:32,620
-un render en específico.
+00:02:54,660 --> 00:02:58,660
+para empezar a desarrollar y colocar a nuestra aplicación
 
 54
-00:02:32,620 --> 00:02:36,220
-Entonces, por ejemplo, yo podría decir que la página de,
+00:02:58,660 --> 00:03:00,660
+de server-side rendering con Angular.
 
 55
-00:02:36,220 --> 00:02:39,800
-no sé, la página de locations, acá ya me autocompleto un poquito.
+00:03:00,660 --> 00:03:02,660
+Vamos a nuestra terminal y lo que vamos a hacer es
 
 56
-00:02:39,800 --> 00:02:44,380
-Por ejemplo, la página de locations, le puedo decir que,
+00:03:02,660 --> 00:03:04,660
+instalar esta dependencia como desarrollo.
 
 57
-00:02:44,380 --> 00:02:46,520
-como yo necesito algo que es del lado del cliente,
+00:03:04,660 --> 00:03:07,660
+Se llama Granderer, que básicamente es el que nos permite
 
 58
-00:02:46,520 --> 00:02:48,140
-le podría decir client.
+00:03:07,660 --> 00:03:09,660
+levantar como un entorno local y hacer pruebas
 
 59
-00:02:48,140 --> 00:02:48,640
-Bien.
+00:03:09,660 --> 00:03:12,660
+de si realmente funcionaría bien nuestro proyecto
 
 60
-00:02:48,640 --> 00:02:50,260
-Entonces, location va a ser client.
+00:03:12,660 --> 00:03:17,660
+corriendo como en una emulación de lo que sería el Edge Computing de Cloudflare.
 
 61
-00:02:50,260 --> 00:02:54,740
-Pero acá le podría decir que esta parte, about, sea prerender.
+00:03:17,660 --> 00:03:19,660
+Entonces simplemente le damos Enter.
 
 62
-00:02:54,740 --> 00:02:55,240
-Bien.
+00:03:19,660 --> 00:03:21,660
+Algo salió mal por acá.
 
 63
-00:02:55,620 --> 00:02:59,900
-Obviamente, acá también tenemos la definición de algunas rutas,
+00:03:22,660 --> 00:03:23,660
+Eh...
 
 64
-00:02:59,900 --> 00:03:02,820
-pero recuerda que el app-routes, este de acá,
+00:03:23,660 --> 00:03:27,660
+Ah, claro, me faltó el Install, obviamente, el "-d",
 
 65
-00:03:02,820 --> 00:03:06,300
-es el que hace el par entre ruta y componente,
+00:03:27,660 --> 00:03:30,660
+y pues instalar la última versión del Granderer.
 
 66
-00:03:07,500 --> 00:03:09,580
-como tal de la forma dinámica.
+00:03:30,660 --> 00:03:32,660
+Ahora, hay un archivo de configuración.
 
 67
-00:03:09,580 --> 00:03:14,620
-Pero este, el app-server, es el que me va a decir cuál es la estrategia de rendering
+00:03:32,660 --> 00:03:36,660
+Normalmente estos archivos se llaman Granderer.json,
 
 68
-00:03:14,620 --> 00:03:16,500
-que va a tener esa ruta en específico.
+00:03:36,660 --> 00:03:40,660
+Granderer.toml, el toml que normalmente uno le puede poner.
 
 69
-00:03:16,860 --> 00:03:19,980
-Entonces, por ejemplo, acá de nuevo, vamos a decir que todo,
+00:03:40,660 --> 00:03:43,660
+Y esto es súper interesante porque desde estos archivos
 
 70
-00:03:19,980 --> 00:03:24,280
-o aquí ya podríamos decir, no sé, pues home, si yo quiero ser más específico,
+00:03:43,660 --> 00:03:46,660
+podemos activar o desactivar servicios de cómputo
 
 71
-00:03:24,280 --> 00:03:25,460
-pero es bueno dejarlo de ser.
+00:03:46,660 --> 00:03:48,660
+de todo lo que es Cloudflare.
 
 72
-00:03:25,460 --> 00:03:27,040
-Voy a darle a ok.
+00:03:48,660 --> 00:03:53,660
+Vamos a escoger el formato que ellos nos aconsejan, que es este,
 
 73
-00:03:27,040 --> 00:03:29,180
-Pero creo que sería, digamos, que, de esta manera,
+00:03:53,660 --> 00:03:57,660
+el JSON-C, que normalmente tiene este tipo de patrón.
 
 74
-00:03:29,180 --> 00:03:32,700
-como digamos que por defecto, todo va a ser server-shared rendering
+00:03:57,660 --> 00:04:00,660
+Entonces vamos a crear este archivo en Cursor.
 
 75
-00:03:32,700 --> 00:03:37,100
-y empiezas a deshabilitar cuáles son ciertas rutas que realmente no van a ser,
+00:04:00,660 --> 00:04:03,660
+Si creo el archivo, literalmente, acá tenemos el archivo
 
 76
-00:03:37,100 --> 00:03:38,520
-pues, desde el servidor.
+00:04:03,660 --> 00:04:05,660
+y este es como el contenido.
 
 77
-00:03:38,520 --> 00:03:39,660
-Por ejemplo, client.
+00:04:05,660 --> 00:04:08,660
+Entonces vamos a tener un esquema, le vamos a poner un nombre.
 
 78
-00:03:39,660 --> 00:03:43,440
-Algo muy común es, por ejemplo, que el sistema de login lo pongamos como client,
+00:04:08,660 --> 00:04:11,660
+Normalmente este nombre es importante porque es el...
 
 79
-00:03:43,440 --> 00:03:47,780
-porque realmente no queremos que eso se rendere desde el lado del servidor,
+00:04:11,660 --> 00:04:14,660
+cómo lo vas a reconocer, como el nombre del servicio
 
 80
-00:03:47,780 --> 00:03:48,860
-no hay necesidad.
+00:04:14,660 --> 00:04:17,660
+que te va a dar. Entonces es como importante que lo tengas bien.
 
 81
-00:03:48,860 --> 00:03:51,980
-Yo, no necesito optimizaciones, motores de búsqueda,
+00:04:17,660 --> 00:04:22,660
+Y acá, por ejemplo, algo muy importante es decirle cuál va a ser el main.javascript,
 
 82
-00:03:51,980 --> 00:03:53,540
-para la página de login.
+00:04:23,660 --> 00:04:26,660
+que va a tener la aplicación y dónde están los assets.
 
 83
-00:03:53,540 --> 00:03:55,340
-Entonces, pues, podría ser client, sin ningún problema.
+00:04:26,660 --> 00:04:28,660
+Esto es súper vital.
 
 84
-00:03:55,340 --> 00:04:00,740
-una aplicación precisamente que de pronto tiene un frontend, bien, hacia el público,
+00:04:28,660 --> 00:04:32,660
+Y cómo nosotros podemos saber realmente cuál es la carpeta correcta,
 
 85
-00:04:01,180 --> 00:04:06,680
-entonces toda esa parte como va a ser server-side. Pero si tienes, no sé, algo así como app,
+00:04:32,660 --> 00:04:37,660
+pues básicamente podemos ir acá y hacemos un ngBuild
 
 86
-00:04:07,540 --> 00:04:12,960
-slash app y ahí vive toda la aplicación dinámica, formularios y demás, es posible
+00:04:37,660 --> 00:04:41,660
+para ver en dónde genera el dist y cómo los va a nombrar.
 
 87
-00:04:12,960 --> 00:04:18,520
-que todo esto sea client. Entonces simplemente podríamos ver ese nivel de routing. Acá
+00:04:41,660 --> 00:04:44,660
+Es decir, la carpeta de distribución que normalmente son los archivos
 
 88
-00:04:18,520 --> 00:04:24,920
-voy a dejar locations y vamos a ver qué tal cambia y pues cuál es el significado que
+00:04:44,660 --> 00:04:47,660
+compilados, transformados y optimizados para enviar.
 
 89
-00:04:24,920 --> 00:04:30,460
-vamos a tener como resultado en nuestro aplicativo. Veamos. Una vez aplicado ese cambio, entonces
+00:04:47,660 --> 00:04:50,660
+Entonces si nosotros nos vamos aquí al dist,
 
 90
-00:04:30,460 --> 00:04:36,040
-podríamos hacer lo siguiente. Por ejemplo, yo podría utilizar, podría ir aquí a ver
+00:04:50,660 --> 00:04:52,660
+vamos a ver que genera dos carpetas, Browser y Server.
 
 91
-00:04:36,040 --> 00:04:42,640
-código fuente y yo sé que la página de home, si yo la deshabilitara o no le pusiera server-side,
+00:04:53,660 --> 00:04:56,660
+Este archivo Server podemos copiarlo, literalmente,
 
 92
-00:04:42,640 --> 00:04:47,840
-pues no podría ver todo el contenido. Acá está todo el contenido porque el contenido
+00:04:56,660 --> 00:05:03,660
+el Related Path lo podemos copiar y poner acá para que no tengamos ningún error.
 
 93
-00:04:47,840 --> 00:04:52,780
-se renderizó desde el lado del servidor. Pero vamos a ver la página de about. Si la
+00:05:03,660 --> 00:05:06,660
+Ahí sería, ese sería el dist.
 
 94
-00:04:52,780 --> 00:04:54,640
-página de about debería ser...
+00:05:06,660 --> 00:05:09,660
+Y assets básicamente va a ser lo que hay en la carpeta de Browser.
 
 95
-00:04:54,920 --> 00:05:00,800
-pre-render o la de locations debería ser solo client-side. Es decir, acá yo no debería
+00:05:09,660 --> 00:05:14,660
+Entonces también podemos copiar el Related Path y ponerlo acá.
 
 96
-00:05:00,800 --> 00:05:06,060
-ver nada de contenido. Entonces si yo voy por acá, voy al... ahí está. View source,
+00:05:14,660 --> 00:05:18,660
+Listo. Entonces esa sería la manera como adecuada de configurar esto.
 
 97
-00:05:06,240 --> 00:05:10,640
-fíjate que no hay contenido, no hay nada de contenido porque el que hace el render
+00:05:18,660 --> 00:05:20,660
+Sin embargo, hay una parte vital.
 
 98
-00:05:10,640 --> 00:05:14,700
-pues es el cliente, no lo está haciendo el servidor, pero ahora lo podemos hacer de forma
+00:05:20,660 --> 00:05:22,660
+Si tú miras literalmente en tus archivos,
 
 99
-00:05:14,700 --> 00:05:20,500
-dinámica. Entonces podemos ver que locations no viene. ¿Y qué pasa con about? About sí
+00:05:22,660 --> 00:05:26,660
+va a haber un archivo que se llama main.server
 
 100
-00:05:20,500 --> 00:05:24,640
-tiene un pre-render, ahí está, digamos que está el contenido de about, pero hay que
+00:05:26,660 --> 00:05:28,660
+y otro llamado server.js.
 
 101
-00:05:24,920 --> 00:05:29,100
-tener cuidado con la técnica de pre-render. Eso se utiliza mucho para contenido que no
+00:05:28,660 --> 00:05:32,660
+Y como ves, este archivo depende de Express.
 
 102
-00:05:29,100 --> 00:05:32,760
-cambia tanto, que no es tan dinámico. ¿Por qué? Porque literalmente esto solo se va
+00:05:32,660 --> 00:05:36,660
+Sin embargo, si nosotros vamos a querer desplegar esto en el Edge Computing
 
 103
-00:05:32,760 --> 00:05:38,140
-a lanzar en el momento de build, en el momento que tú hagas una construcción y luego, no
+00:05:36,660 --> 00:05:39,660
+en un runtime que no dependa de Node.js,
 
 104
-00:05:38,140 --> 00:05:43,660
-sé, mandes eso a tu hosting o lo que sea, pero habría que haber un proceso manual.
+00:05:39,660 --> 00:05:41,660
+básicamente debemos salir de Express,
 
 105
-00:05:43,660 --> 00:05:48,300
-Si tú quieres actualizar la página de about, vas, la modificas, haces un build y lanzas.
+00:05:41,660 --> 00:05:43,660
+porque Express depende mucho de Node.
 
 106
-00:05:48,300 --> 00:05:53,400
-¿Por qué? Porque entonces él se va a quedar como con esa página estática. Es una de
+00:05:43,660 --> 00:05:46,660
+Entonces aquí es donde tenemos que empezar a hacer ciertas configuraciones.
 
 107
-00:05:53,400 --> 00:05:54,760
-las mejores habilidades de por sí.
+00:05:46,660 --> 00:05:51,660
+Para no dañar este archivo, voy a crear otro, copio-pego,
 
 108
-00:05:54,760 --> 00:06:00,360
-Porque no cargamos al servidor de rendería esa página siempre, cada vez, sino que como
+00:05:51,660 --> 00:05:52,660
+y lo renombro.
 
 109
-00:06:00,360 --> 00:06:05,940
-no cambia, ya está pre-renderizada. Entonces ya está lista, literalmente ya está el contenido
+00:05:52,660 --> 00:05:55,660
+A este lo voy a llamar server.edge.
 
 110
-00:06:05,940 --> 00:06:12,640
-y lo podemos ver. Es decir, si tú vas acá al, acá a la, pues al dist que él genera,
+00:05:55,660 --> 00:05:56,660
+¿Por qué Edge?
 
 111
-00:06:12,640 --> 00:06:17,640
-vamos a ir un momento a la terminal, por ejemplo. Acá vamos a ir a la terminal, voy a hacer
+00:05:56,660 --> 00:05:59,660
+Porque no solo nos va a servir para Cloud for Worker,
 
 112
-00:06:17,640 --> 00:06:24,760
-un build de este sitio y vamos a ver cómo él va a generar cada una de las páginas.
+00:05:59,660 --> 00:06:02,660
+sino que podemos desplegar en Dino, en Boon,
 
 113
-00:06:24,760 --> 00:06:31,760
-Como tenemos el RenderRender, pues él debería generar como un ruteo para cada una. Entonces
+00:06:02,660 --> 00:06:05,660
+y en otros runtimes muy interesantes,
 
 114
-00:06:31,760 --> 00:06:36,500
-si yo voy acá, voy al dist, vamos a ver que si me voy a nivel de server, pues obviamente
+00:06:05,660 --> 00:06:07,660
+pues el ecosistema de JavaScript.
 
 115
-00:06:36,500 --> 00:06:42,000
-está todo el chunk y demás. Pero fíjate que acá está nuestro index, bien, y por
+00:06:07,660 --> 00:06:09,660
+¿Qué va a tener esto? Vamos a verlo.
 
 116
-00:06:42,000 --> 00:06:48,300
-acá a nivel de server, vamos a ver, mira que acá está la página de about, ya como
+00:06:09,660 --> 00:06:12,660
+Lo único que tiene que tener este archivo,
 
 117
-00:06:48,300 --> 00:06:54,760
-pre-renderizada. Fíjate que él ya pre-renderiza ese contenido, pero no encontramos locations.
+00:06:12,660 --> 00:06:14,660
+server.edge, es lo siguiente.
 
 118
-00:06:54,760 --> 00:06:59,080
-¿Por qué locations? Va a ser client-side. Entonces todas las páginas que coloquemos
+00:06:14,660 --> 00:06:17,660
+Vamos a, desde Angular Server Surrendering,
 
 119
-00:06:59,080 --> 00:07:04,400
-como pre-render básicamente va a dejar como todo el HTML ya listo, ya preparado. El servidor
+00:06:17,660 --> 00:06:20,660
+vamos a crear, importar a Angular App Engine,
 
 120
-00:07:04,400 --> 00:07:09,500
-no va a hacer nada, simplemente lo que ya preparó, lo lanza. Pero para que nosotros
+00:06:20,660 --> 00:06:22,660
+y Create Request Handler.
 
 121
-00:07:09,500 --> 00:07:14,980
-lo actualicemos, pues tendríamos que estar haciendo building continuamente. Pero esa
+00:06:22,660 --> 00:06:24,660
+Entonces aquí creamos esa instancia,
 
 122
-00:07:14,980 --> 00:07:19,100
-es precisamente una de las habilidades. Tú escoges ya cuál es la mejor para ti. Vamos
+00:06:24,660 --> 00:06:26,660
+y lo tenemos que configurar de esta manera.
 
 123
-00:07:19,100 --> 00:07:23,020
-a ver un poquito de la documentación para ver más casos. Si quieres ir mucho más a
+00:06:26,660 --> 00:06:29,660
+Bien, esto es como lo único que tenemos que hacer.
 
 124
-00:07:23,020 --> 00:07:24,100
-fondo, aquí está como el link de la página de about.com. Aquí está como el link de la
+00:06:29,660 --> 00:06:33,660
+Así va a funcionar en cualquier servidor que no dependa de Node.js,
 
 125
-00:07:24,100 --> 00:07:28,180
-página de about.com. Aquí está como la documentación de este feature, se llama
+00:06:33,660 --> 00:06:36,660
+y por ende, estos son los runtimes que son de nuevo rápidos,
 
 126
-00:07:28,180 --> 00:07:33,100
-server-routing. Y aquí es donde te dicen, mira, la página principal sería client,
+00:06:36,660 --> 00:06:38,660
+muy, muy rápidos en rendimiento.
 
 127
-00:07:33,260 --> 00:07:38,120
-pero about es pre-render, pero profile es server y todo lo demás, mira, acá dice todas
+00:06:38,660 --> 00:06:41,660
+Eso es lo único que tendríamos que tener desde esta parte.
 
 128
-00:07:38,120 --> 00:07:41,960
-las demás van a ser server-side. Mira que también entonces lo colocaron por acá al
+00:06:41,660 --> 00:06:44,660
+Lo siguiente es ir al AngularJSON,
 
 129
-00:07:41,960 --> 00:07:47,060
-final y la página inicial es modo client. Acá literalmente ya van mucho más a fondo
+00:06:44,660 --> 00:06:48,660
+y por acá vamos a ver que se hace referencia al server.
 
 130
-00:07:47,060 --> 00:07:51,700
-y si estás interesado en ir más a fondo en esta parte, pues déjame un comentario
+00:06:48,660 --> 00:06:50,660
+Fíjate que acá se hace referencia
 
 131
-00:07:51,700 --> 00:07:53,700
-y pues haría un segundo video específico.
+00:06:50,660 --> 00:06:53,660
+al server. Bien, tiene entry y tiene server.
 
 132
-00:07:54,100 --> 00:08:01,340
-Fijate que acá, digamos que yo tengo un Post, es decir, tengo artículos y como son dinámicos,
+00:06:53,660 --> 00:06:56,660
+Aquí es donde le decimos que queremos utilizar ese edge.
 
 133
-00:08:01,340 --> 00:08:05,760
-es decir, tengo el Academy arrojado, pues tengo la página, por ejemplo, estoy actualizando
+00:06:56,660 --> 00:06:59,660
+Si de alguna manera quisiéramos luego expresar,
 
 134
-00:08:05,760 --> 00:08:07,100
-los Re777. Manufacturer...
+00:06:59,660 --> 00:07:02,660
+pues volver a desplegar utilizando express y node,
 
 135
-00:08:07,100 --> 00:08:11,560
-Realmente yo tengo diferentes premios en el cliente y al final de esto puedo donde
+00:07:02,660 --> 00:07:05,660
+pues volvemos al archivo o lo apuntamos al archivo
 
 136
-00:08:11,560 --> 00:08:19,780
-decir de donde nosotros estamos y después de eso tengo
+00:07:05,660 --> 00:07:07,660
+que ya teníamos.
 
 137
-00:08:19,780 --> 00:08:21,260
-las actividades en esta página.
+00:07:07,660 --> 00:07:10,660
+Sin embargo, algo muy, muy, muy importante
 
 138
-00:08:21,260 --> 00:08:22,180
-Y aquí otra cosa muy interesante.
+00:07:10,660 --> 00:07:12,660
+y que no lo encontré en ningún lado,
 
 139
-00:08:22,180 --> 00:08:23,120
-Aquí tenemos Herx misterio más nada.
+00:07:12,660 --> 00:07:14,660
+no está en la documentación de Angular,
 
 140
-00:08:23,120 --> 00:08:23,860
-Es decir, otra cosa queค Scholta no se conoce molto erste, pero psol nlat referenced se vaむ
+00:07:14,660 --> 00:07:17,660
+o en la documentación como tal,
 
 141
-00:08:23,860 --> 00:08:25,740
-el ID, ¿cómo haríamos para
+00:07:17,660 --> 00:07:19,660
+no la encontré, pero sí está como en el código,
 
 142
-00:08:25,740 --> 00:08:28,320
-prerenderizar todos esos contenidos
+00:07:19,660 --> 00:07:22,660
+y sí está en algunos ejemplos de Cloudflare,
 
 143
-00:08:28,320 --> 00:08:30,180
-de forma
+00:07:22,660 --> 00:07:25,660
+es esta bandera, esta bandera, literalmente,
 
 144
-00:08:30,180 --> 00:08:31,920
-dinámica cada vez que le hagamos ngBuild?
+00:07:25,660 --> 00:07:28,660
+si no la pones experimental platform,
 
 145
-00:08:32,060 --> 00:08:33,680
-Que vaya a mapear todos los IDs
+00:07:28,660 --> 00:07:30,660
+si no la pones en neutral,
 
 146
-00:08:33,680 --> 00:08:35,620
-y los prerenderice, eso es una locura.
+00:07:30,660 --> 00:07:34,660
+literal, no va a servir nada de esta configuración.
 
 147
-00:08:35,940 --> 00:08:37,800
-Pero se puede, se puede haciendo
+00:07:34,660 --> 00:07:36,660
+Es súper raro, es súper raro porque literalmente
 
 148
-00:08:37,800 --> 00:08:39,560
-este par de configuraciones. Es más,
+00:07:36,660 --> 00:07:38,660
+no hay documentación de esto.
 
 149
-00:08:39,980 --> 00:08:41,700
-si nosotros ya empezamos a hablar
+00:07:38,660 --> 00:07:40,660
+Obviamente, pues no en la documentación per se,
 
 150
-00:08:41,700 --> 00:08:43,940
-de servidor, es decir,
+00:07:40,660 --> 00:07:43,660
+en angular.dev no vas a encontrar nada,
 
 151
-00:08:44,240 --> 00:08:45,800
-de esto en modo server,
+00:07:43,660 --> 00:07:46,660
+pero literal, acá hay una documentación
 
 152
-00:08:46,220 --> 00:08:47,960
-hay algunas cosas bien interesantes
+00:07:46,660 --> 00:07:48,660
+un poco más que es dada por este esquema.
 
 153
-00:08:47,960 --> 00:08:49,920
-en donde uno ya puede empezar a jugar con
+00:07:49,660 --> 00:07:52,660
+Este esquema tiene una documentación per se,
 
 154
-00:08:49,920 --> 00:08:51,920
-correr cierto código del lado del servidor
+00:07:52,660 --> 00:07:55,660
+entonces aquí te dice, mira, por defecto,
 
 155
-00:08:51,920 --> 00:08:53,760
-como por ejemplo
+00:07:55,660 --> 00:08:00,660
+esto genera un bundle optimizado para node.js environments,
 
 156
-00:08:53,760 --> 00:08:55,440
-poner un header en específico
+00:08:00,660 --> 00:08:03,660
+pero si lo pones en neutral, esto genera una,
 
 157
-00:08:55,440 --> 00:08:57,840
-o una llave en específico que solo
+00:08:03,660 --> 00:08:06,660
+pues un bundle que no depende de node.js
 
 158
-00:08:57,840 --> 00:08:59,140
-corra del lado del servidor.
+00:08:06,660 --> 00:08:10,660
+y se puede correr en ad workers o serverless platform,
 
 159
-00:09:00,060 --> 00:09:01,840
-Entonces aquí es donde podemos encontrar mucho
+00:08:10,660 --> 00:08:14,660
+¿bien? Acá literalmente me dice serverless platform.
 
 160
-00:09:01,840 --> 00:09:04,180
-más detallado este tipo de estrategias.
+00:08:14,660 --> 00:08:16,660
+Eso es muy vital porque recuerda que al final,
 
 161
-00:09:04,560 --> 00:09:05,540
-Pero por ahora, de nuevo,
+00:08:16,660 --> 00:08:18,660
+si tú desplegas en un servidor de node,
 
 162
-00:09:06,180 --> 00:09:07,640
-este sería el escenario.
+00:08:18,660 --> 00:08:21,660
+literalmente es una máquina corriendo vivo
 
 163
-00:09:08,100 --> 00:09:09,980
-Si quieres ir mucho más a fondo, déjame en los comentarios
+00:08:21,660 --> 00:08:24,660
+que pues gasta dinero, pero serverless solo se ejecuta
 
 164
-00:09:09,980 --> 00:09:11,540
-y podemos hacer sobre todo de
+00:08:24,660 --> 00:08:27,660
+cada vez que pues corre y con edge computing
 
 165
-00:09:11,540 --> 00:09:13,680
-prerendering, sobre todo de un sistema de block,
+00:08:27,660 --> 00:08:29,660
+no hay costo de encendido de esa máquina.
 
 166
-00:09:14,220 --> 00:09:15,900
-cómo podríamos hacer todo ese
+00:08:29,660 --> 00:08:34,660
+Es, es, el call start es instantáneo y segundo,
 
 167
-00:09:15,900 --> 00:09:17,500
-enganche para prerenderizar todo.
+00:08:34,660 --> 00:08:36,660
+tiene un JavaScript mucho más liviano que hace que,
 
 168
-00:09:17,900 --> 00:09:19,720
-Servers y client-side no tienen tanta
+00:08:36,660 --> 00:08:39,660
+pues, corra y renderice mucho más rápido.
 
 169
-00:09:19,720 --> 00:09:21,720
-complejidad, pero de pronto un prerendering
+00:08:39,660 --> 00:08:43,660
+Pero este experimental platform neutral es vital.
 
 170
-00:09:21,720 --> 00:09:23,540
-un poco sí. Y eso fue todo.
+00:08:43,660 --> 00:08:45,660
+Ahora, si toda esa configuración sirvió,
 
 171
-00:09:23,540 --> 00:09:25,480
-Literalmente es un feature bastante
+00:08:45,660 --> 00:08:48,660
+deberíamos correr un comando llamado endconfig,
 
 172
-00:09:25,480 --> 00:09:27,820
-compacto, pero muy potente porque realmente
+00:08:48,660 --> 00:08:54,660
+npx, llamado randler, que fue la dependencia local
 
 173
-00:09:27,820 --> 00:09:29,660
-uno no piensa en casarse
+00:08:54,660 --> 00:08:58,660
+que instalamos, randler, dev, y debería funcionar.
 
 174
-00:09:29,660 --> 00:09:31,580
-con una sola estrategia para
+00:08:58,660 --> 00:09:04,660
+Vamos a ver. No, por acá creo que lo estoy digitando mal.
 
 175
-00:09:31,580 --> 00:09:33,380
-todo tu website, sino que
+00:09:04,660 --> 00:09:07,660
+Sí creo que es randler, dev. Vamos a ver.
 
 176
-00:09:33,380 --> 00:09:35,320
-literalmente puedes ir de forma granular
+00:09:07,660 --> 00:09:10,660
+Y listo. Fíjate que acá hay unos pequeños errores
 
 177
-00:09:35,320 --> 00:09:37,840
-ruta por ruta y ver cuál es la estrategia
+00:09:10,660 --> 00:09:16,660
+y apuntan al server.mjs. Esto es porque todavía está generando
 
 178
-00:09:37,840 --> 00:09:39,720
-de renderizado que más te viene mejor.
+00:09:16,660 --> 00:09:19,660
+el build anterior y el build anterior, pues,
 
 179
-00:09:40,180 --> 00:09:41,620
-Así que déjame en los comentarios si ya sabías
+00:09:19,660 --> 00:09:20,660
+todavía no tenía esta configuración.
 
 180
-00:09:41,620 --> 00:09:43,680
-de esta técnica, si la aprendiste en este video
+00:09:20,660 --> 00:09:22,660
+Así que vamos a generar otro build y es más,
 
 181
-00:09:43,680 --> 00:09:45,800
-y si la vas a empezar a aplicar en tus proyectos.
+00:09:22,660 --> 00:09:25,660
+antes de generarlo, les voy a mostrar una pequeña pieza
 
 182
-00:09:46,240 --> 00:09:47,540
-Recuerda que para
+00:09:25,660 --> 00:09:29,660
+de código, server. Acá está este server.m.
 
 183
-00:09:47,540 --> 00:09:49,120
-aplicar esto tienes que
+00:09:29,660 --> 00:09:33,660
+Fíjate que acá hay algunas cosas que literalmente acá todavía
 
 184
-00:09:49,120 --> 00:09:51,520
-por defecto habilitarse al browser rendering.
+00:09:33,660 --> 00:09:36,660
+dependen de node. Entonces, él va a generar una nueva
 
 185
-00:09:51,520 --> 00:09:53,340
-Es decir, tienes que habilitar el proyecto
+00:09:36,660 --> 00:09:39,660
+compilación en la cual no dependa de node. ¿Vale?
 
 186
-00:09:53,340 --> 00:09:55,540
-como server-server rendering y ahí sí ya empiezas
+00:09:39,660 --> 00:09:42,660
+Entonces, si yo hago un nuevo build con las nuevas configuraciones,
 
 187
-00:09:55,540 --> 00:09:57,380
-a degradar quién va a ser client
+00:09:42,660 --> 00:09:45,660
+va a volver a ser el building de mi aplicación, pero,
 
 188
-00:09:57,380 --> 00:09:59,620
-o quién va a ser prerendering. Pero por defecto
+00:09:45,660 --> 00:09:48,660
+para algo que no depende de node. Entonces, fíjate que ya
 
 189
-00:09:59,620 --> 00:10:01,500
-el proyecto debe estar habilitado
+00:09:48,660 --> 00:09:52,660
+el server.js cambió y ya no tiene dependencias de node.
 
 190
-00:10:01,500 --> 00:10:02,440
-para server-server rendering.
+00:09:52,660 --> 00:09:56,660
+Corre en un JavaScript más puro, básicamente.
 
 191
-00:10:03,260 --> 00:10:05,300
-Es bastante sencillo habilitarlo, pero
+00:09:56,660 --> 00:10:01,660
+Entonces, ahora sí debería funcionar el randler dev. Veamos.
 
 192
-00:10:05,300 --> 00:10:07,320
-esto también requiere que ya
+00:10:01,660 --> 00:10:04,660
+Fíjate que acá dice que supuestamente ya está corriendo.
 
 193
-00:10:07,320 --> 00:10:09,480
-obviamente necesitamos un servidor, entonces
+00:10:04,660 --> 00:10:10,660
+En esta ubicación, vamos a ver si... Acá literalmente ya está corriendo
 
 194
-00:10:09,480 --> 00:10:11,520
-tendrías que cambiar el modelo de hosting, pero ya
+00:10:10,660 --> 00:10:14,660
+la aplicación y si nosotros básicamente inspeccionamos,
 
 195
-00:10:11,520 --> 00:10:13,260
-he hablado de cómo hacerlo
+00:10:14,660 --> 00:10:19,660
+le damos ver código fuente, ver page source, vemos que literalmente
 
 196
-00:10:13,260 --> 00:10:15,640
-con server-server rendering, cómo publicarlo por ejemplo
+00:10:19,660 --> 00:10:23,660
+está generando server surrendering. Es decir, el contenido se está
 
 197
-00:10:15,640 --> 00:10:17,520
-en Cloudflare, etc. Entonces ya tienes
+00:10:23,660 --> 00:10:27,660
+prerenderizando, se genera o se renderiza desde el lado del servidor.
 
 198
-00:10:17,520 --> 00:10:19,420
-varias opciones o cómo ya lo podrías
+00:10:27,660 --> 00:10:30,660
+Sólo que una vez desplegado en la nube de Cloudflare, va a alcanzar
 
 199
-00:10:19,420 --> 00:10:20,840
-desplegar en un servidor de Naut.
+00:10:30,660 --> 00:10:34,660
+velocidades muy, muy interesantes. Una cosa más. Si al final estás
 
 200
-00:10:20,840 --> 00:10:23,400
-Pero es interesante y muy importante
+00:10:34,660 --> 00:10:39,660
+utilizando HTTP, pues para hacer peticiones, obviamente,
 
 201
-00:10:23,400 --> 00:10:25,060
-sobre todo que ya al habilitar
+00:10:39,660 --> 00:10:43,660
+¿quién lo está utilizando? Al final, tu aplicación de formen necesita
 
 202
-00:10:25,060 --> 00:10:27,080
-server-server rendering podemos tener estas otras
+00:10:43,660 --> 00:10:49,660
+hacer request hacia servidores. Acá te recomiendo, o ni siquiera te recomiendo,
 
 203
-00:10:27,080 --> 00:10:28,780
-features, estas otras novedades
+00:10:49,660 --> 00:10:52,660
+para evitar problemas, te recomiendo que configures esto así.
 
 204
-00:10:28,780 --> 00:10:31,060
-de ser mucho más granular y escoger la
+00:10:52,660 --> 00:10:57,660
+Provide HTTP with fetch. Con eso se va a utilizar el fetch nativo de JavaScript
 
 205
-00:10:31,060 --> 00:10:33,020
-estrategia de rendering adecuada para
+00:10:57,660 --> 00:11:01,660
+sin ningún problema y eso también va a acoplarse muy bien en el server surrendering.
 
 206
-00:10:33,020 --> 00:10:34,680
-nuestro website. Así que nos vemos
+00:11:01,660 --> 00:11:06,660
+Ahora, tú obviamente debes tener una cuenta en Cloudflare y aquí es donde
 
 207
-00:10:34,680 --> 00:10:36,560
-y suscríbete para más contenido
+00:11:06,660 --> 00:11:10,660
+vamos a empezar a ligar y hacer el deployment. Entonces, aquí ya tengo el login
 
 208
-00:10:36,560 --> 00:10:37,940
-y nos vemos en la próxima.
+00:11:10,660 --> 00:11:13,660
+de mi aplicación. Voy a crear desde la tabla de Windows, voy a crear una cuenta
+
+209
+00:11:13,660 --> 00:11:16,660
+en la terminal. Entonces, aquí en la terminal, ya digamos que aquí
+
+210
+00:11:16,660 --> 00:11:21,660
+me funciona todo. Entonces, voy a correr el comando npx render, pero esta vez
+
+211
+00:11:21,660 --> 00:11:26,660
+voy a hacer un login. Bien. Entonces, él me va a pedir como una validación.
+
+212
+00:11:26,660 --> 00:11:33,660
+Aquí vamos a ver si yo lo autorizo. Ahí se autoriza. Perfecto. Y una vez
+
+213
+00:11:33,660 --> 00:11:38,660
+autorizado, yo podría hacer el deploy. Render deploy. Es lo único que necesito.
+
+214
+00:11:38,660 --> 00:11:43,660
+Literalmente, es lo único que necesito para hacer el deployment. Recuerda el nombre que le habías puesto.
+
+215
+00:11:43,660 --> 00:11:46,660
+Porque ese va a ser el nombre que, pues, con el cual vamos a identificarlo.
+
+216
+00:11:46,660 --> 00:11:52,660
+Entonces, simplemente ponemos npx render deploy. Obviamente, ya deberías haber hecho ng build.
+
+217
+00:11:52,660 --> 00:11:59,660
+Entonces, tú corres ng build y lo pones. Por acá me dice que nos falta poner un compatibility.
+
+218
+00:11:59,660 --> 00:12:06,660
+Entonces, vamos a poner este que me está sugiriendo. Esto básicamente es para ver
+
+219
+00:12:06,660 --> 00:12:12,660
+desde qué fecha podemos ponerle compatibilidad. Normalmente, si uno quiere crear o utilizar
+
+220
+00:12:12,660 --> 00:12:20,660
+ciertas partes chiquitas de Node.js, esto podría ser vital. Pero, bueno, básicamente
+
+221
+00:12:20,660 --> 00:12:25,660
+es obligatorio ponerlo. Entonces, simplemente lo vamos a poner. Listo. Lo ponemos
+
+222
+00:12:25,660 --> 00:12:31,660
+y intentemos hacer otra vez el deployment. Vamos a ver cómo sale. Ahí está haciendo el build.
+
+223
+00:12:31,660 --> 00:12:37,660
+Está subiendo la carpeta de assets. Y luego, pues, está subiendo. Luego ya empieza
+
+224
+00:12:37,660 --> 00:12:41,660
+a subir todo lo que es nuestro server-side. Vamos a ver. Ahí dice...
+
+225
+00:12:42,660 --> 00:12:48,660
+Que ya lo está subiendo. Se está subiendo. Ahí está. Y fíjate que me creó como una dirección
+
+226
+00:12:48,660 --> 00:12:55,660
+que vamos a ver. Fíjate que acá está la aplicación. Y vamos a ver si tiene server-side rendering.
+
+227
+00:12:55,660 --> 00:13:02,660
+Tiene server-side rendering. Bien. Si tú comparas la velocidad de rendering de esta aplicación,
+
+228
+00:13:02,660 --> 00:13:09,660
+de esta, de el Edge, versus un servidor de Node.js normal, siempre, siempre va a ganar esta.
+
+229
+00:13:09,660 --> 00:13:11,660
+¿Por qué? Porque el Edge es mucho más rápido.
+
+230
+00:13:11,660 --> 00:13:15,660
+Un runtime mucho más liviano para correr tus aplicaciones. Y listo.
+
+231
+00:13:15,660 --> 00:13:19,660
+Ya tienes una aplicación en Cloudflare con server-side rendering en Angular.
+
+232
+00:13:19,660 --> 00:13:23,660
+Así de sencillo. Cloudflare es una de mis nubes preferidas. Y de por sí se han
+
+233
+00:13:23,660 --> 00:13:30,660
+haciendo muchas cosas interesantes con AI Edge Computing. Todo lo que hacen con su runtime
+
+234
+00:13:30,660 --> 00:13:34,660
+de Cloudflare Worker, etc. Así que realmente lo recomiendo mucho. Yo lo utilizo mucho como para
+
+235
+00:13:34,660 --> 00:13:39,660
+proyectos personales y algunos proyectos, pues, side projects que tengo montados allí
+
+236
+00:13:39,660 --> 00:13:41,660
+y algunos clientes. Así que realmente te lo recomiendo mucho.
+
+237
+00:13:41,660 --> 00:13:46,660
+Déjame en los comentarios si esto te funcionó. Y recuerda suscribirte. Y nos vemos en la próxima.
 
